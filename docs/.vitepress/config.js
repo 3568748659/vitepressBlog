@@ -30,8 +30,7 @@ const myList = [
     {
         text: '其他',
         items: [
-            { text: 'linux命令', link: '/other/linux' },
-            { text: 'git相关', link: '/other/git' },
+            { text: 'linux命令', link: '/other/linux' }
         ]
     }
 ]

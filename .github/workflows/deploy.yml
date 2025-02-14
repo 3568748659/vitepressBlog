@@ -66,5 +66,3 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           enablement: true
-      - name: Install TypeScript
-        run: npm install -g typescript

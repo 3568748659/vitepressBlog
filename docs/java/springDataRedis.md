@@ -385,7 +385,6 @@ public class RedisKeyExpirationListener implements MessageListener {
 
 客户端向redis发送请求，命中直接返回。未命中查询数据库，向redis中写入缓存，之后返回
 
-![image-20241118下午103345225](../../../../Library/Application%20Support/typora-user-images/image-20241118%E4%B8%8B%E5%8D%88103345225.png)
 
 # Spring Cache
 

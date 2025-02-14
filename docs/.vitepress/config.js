@@ -43,6 +43,11 @@ export default defineConfig({
     head: [ // 配置网站的图标（显示在浏览器的 tab 上）
         ['link', { rel: 'icon', href: '/public/favicon.ico' }],
     ],
+    markdown: {
+        image: {
+            lazyLoading: true 
+        }
+    },
     themeConfig: { // 页面顶部导航栏
         nav: [
             { text: '首页', link: '/' },

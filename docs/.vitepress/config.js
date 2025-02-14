@@ -1,3 +1,5 @@
+import { defineConfig } from 'vitepress'
+
 const myList = [
     {
         text: 'java',
@@ -36,7 +38,12 @@ const myList = [
 ]
 
 
-export default {
+export default defineConfig({
+    markdown: {
+        image: {
+            lazyLoading: true // 延迟加载，防止构建时检查图片
+        }
+    },
     title: "笔记文档库", // 网站标题
     description: "笔记文档库", // 网站描述
     head: [ // 配置网站的图标（显示在浏览器的 tab 上）
@@ -63,4 +70,5 @@ export default {
             '/other/': myList
         }
     }
-}
+})
+

@@ -38,6 +38,7 @@ const myList = [
 ]
 
 export default defineConfig({
+    base: '/vitepressBlog/',
     title: "笔记文档库", // 网站标题
     description: "笔记文档库", // 网站描述
     head: [ // 配置网站的图标（显示在浏览器的 tab 上）
@@ -45,7 +46,7 @@ export default defineConfig({
     ],
     markdown: {
         image: {
-            lazyLoading: true 
+            lazyLoading: true
         }
     },
     themeConfig: { // 页面顶部导航栏

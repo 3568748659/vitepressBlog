@@ -37,7 +37,7 @@ title: 关于我
 
 ### 数据库
 
-- **MySQ**
+- **MySQL**
 - **MongoDB**
 - **Redis**
 

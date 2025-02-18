@@ -11,7 +11,17 @@ java完全面向对象，所有的方法都是对象中的方法。在继承中�
 
 ## hashCode
 
-确定对象在哈希表中的索引位置，提升equals方法效率
+目的是确定对象在哈希表中的索引位置，提升equals方法效率
+
+## get/set方法意义
+
+设立之初的目的是保证数据的安全
+
+如果直接设置public属性，直接.访问，可以随意设置
+
+可以通过set方法，在set方法中验证数据合法性，之后赋值给私有方法
+
+还有格式化等
 
 # 基本概念
 
@@ -32,23 +42,29 @@ JRE：java的运行环境，只需要运行，不需要编写的环境，在JRE�
 
 java是混合型语言，即编译和解释型，同时存在，运行在java虚拟机中，虚拟机为java语言本身自带的，在对应的操作系统中有对应的JVM虚拟机
 
-## linux安装
+# 编译运行
 
-windows中使用集成开发环境
-
-linux安装非常方便
-
-```
-sudo apt install openjdk-17-jdk
-```
-
-# 打包相关
-
-通过maven生命周期，在idea中进行打包
+推荐通过maven生命周期，在idea中进行打包
 
 1. 设置--项目结构--设置主键和打包类型
 2. 构建--构建工件
 3. 指定版本运行
+
+## javac编译
+
+使用Java原生命令编译和运行：
+
+- 使用javac命令来编译Java文件
+
+    ```java
+    javac HelloWorld.java
+    ```
+
+- ​	使用java命令来运行
+
+    ```java
+    java HelloWorld	
+    ```
 
 ## 运行jar包
 
@@ -124,46 +140,85 @@ cc.liyinghao.Start
 
 # 关键字
 
-## 访问控制
+全局关键字（48个），保留字（3个），上下文关键字（16个）
 
-- private 私有的
-- protected 受保护的
-- public 公共的
-- default 默认  在同一包内可见
+（1）全局关键字（48个）
 
-## 类方法和变量修饰符
+> 数据类型有关（12个）：byte、short、int、long、float、double、char、boolean、void、class、interface、enum
+>
+> 流程控制语句结构（11个）：if、else、switch、case、default、for、while、do、break、continue、return
+>
+> 包相关（2个）：package、import
+>
+> 对象和引用（4个）：new、this、super、instanceof
+>
+> 继承和实现（2个）：extends、implements
+>
+> 修饰符（11个）：private、protected、public、static、final、native、abstract、transient、strictfp、synchronized、volatile
+>
+> 测试和异常处理（6个）：assert、try、catch、finally、throw、throws
 
-- abstract 声明抽象
-- class 类
-- extends 扩充、继承
-- final 最终值、不可改变的  === const
-- implements 实现（接口）
-- interface 接口
-- native 本地、原生方法（非 Java 实现）
-- new 创建
-- static 静态
-- strictfp 严格浮点、精准浮点
-- synchronized 线程、同步
-- transient 短暂
-- volatile 易失
+| 关键字   | 解释                                    | 关键字     | 解释                                | 关键字       | 解释                 |
+| -------- | --------------------------------------- | ---------- | ----------------------------------- | ------------ | -------------------- |
+| abstract | 抽象类或抽象方法                        | float      | 单精度浮点型                        | private      | 私有化               |
+| assert   | 断言                                    | for        | for循环结构                         | return       | 返回                 |
+| byte     | 字节类型                                | final      | 类不可被继承、方法不能被重写 、常量 | short        | 短整型               |
+| boolean  | 布尔类型                                | finally    | try-catch-finally最终处理           | switch       | switch-case结构      |
+| break    | 中断循环或switch                        | int        | 整型                                | static       | 静态的               |
+| char     | 字符类型                                | if         | if-else分支结构                     | super        | 父类的               |
+| class    | 定义类                                  | instanceof | 判断是否xx类的实例                  | synchronized | 同步的               |
+| case     | switch-case结构                         | import     | 导包                                | this         | 当前对象             |
+| continue | 继续循环                                | interface  | 定义接口                            | throw        | 抛出异常对象         |
+| catch    | try-catch异常处理                       | implements | 实现接口                            | throws       | 声明抛出的异常类型   |
+| double   | 双精度浮点型                            | long       | 长整型                              | try          | try-catch异常处理    |
+| do       | do-while循环                            | new        | 创建对象                            | transient    | 瞬时的               |
+| default  | switch-case结构、接口默认方法、默认值等 | native     | 本地的                              | void         | 空的                 |
+| else     | if-else分支结构                         | package    | 定义包                              | volatile     | 线程可见             |
+| enum     | 定义枚举                                | public     | 公共的                              | while        | while、do-while循环  |
+| extends  | 继承                                    | protected  | 受保护的                            | strictfp     | 精确浮点（`已废弃`） |
 
-## 程序控制语句
+（2）保留字（3个）
 
-- break 跳出循环
-- case 定义一个值以供 switch 选择
-- continue 继续
-- do 运行 
-- instanceof 实例
-- switch 根据值选择执行
+| 保留字 | 解释 | 保留字 | 解释   |
+| ------ | ---- | ------ | ------ |
+| const  | 常量 | _      | 下划线 |
+| goto   | 跳转 |        |        |
 
-**break**
+> 相关的面试题：
+>
+> 问：Java中有没有goto关键字？有，但是goto属于保留字。
+>
+> 问：保留字是什么意思？保留字是指在语言中已经定义但当前未使用的字，相当于预留的关键字。
 
-给循环起名字之后指定跳出
+（3）上下文关键字（16个）
 
-```
-loop: while (true) {
-break loop;
-```
+| 关键字     | 解释                                                         |
+| ---------- | ------------------------------------------------------------ |
+| yield      | switch-case表达式用于返回某个case分支的结果                  |
+| record     | 声明记录类                                                   |
+| sealed     | 声明类是密封                                                 |
+| permits    | 用于指定密封类允许哪些子类继承它或哪些实现类实现它           |
+| non-sealed | 声明类是非密封的，密封类的子类只能是final、non-sealed、sealed之一 |
+| var        | 在方法体中定义局部变量，变量的具体类型由首次赋值给该变量的值类型来自动推断 |
+|            |                                                              |
+| module     | 在模块声明文件`module-info.java`中用于模块声明，例如：module 模块名{  } |
+| exports    | 在模块声明文件`module-info.java`中用于指定哪些包对外部模块可见，例如：exports 包名 【to 模块名1，模块名2】，表示允许外部模块在编译时和运行时访问指定包的public成员 |
+| to         | 与exports一起使用                                            |
+| open       | 在模块声明文件`module-info.java`中用于声明该模块的所有包在runtime允许使用反射访问，例如：open module 模块名{ } |
+| opens      | 在模块声明文件`module-info.java`中用于声明该模块的指定包在runtime允许使用反射访问，例如：opens  包名; |
+| requires   | 在模块声明文件`module-info.java`中用于指定当前模块依赖哪些模块，例如： requires  另一个模块名; |
+| transitive | requires  transitive 另一个模块名;                           |
+| uses       | 在模块声明文件`module-info.java`中用于声明当前模块需要xx服务，例如：use 接口名; |
+| provides   | 在模块声明文件`module-info.java`中用于指定当前模块提供了某些服务，例如：provides 接口  with 实现类; |
+| with       | 与provides一起使用                                           |
+
+（4）特殊值（3个）
+
+| 特殊值 | 解释 |
+| ------ | ---- |
+| null   | 空值 |
+| true   | 真   |
+| false  | 假   |
 
 ## try/catch
 
@@ -174,10 +229,11 @@ break loop;
 - throws 声明一个异常可能被抛出
 - try 捕获异常
 
-## 包相关
+#### assert断言
 
-- import  引入
-- package 包
+- 如果boolean表达式]为true，则程序继续执行。
+- 如果为false，则程序抛出AssertionError，并终止执行。
+- 可以输出到日志
 
 # 数据类型
 
@@ -251,16 +307,6 @@ for( String name : names ) {
 }
 ```
 
-# try/catch
-
-在try模块中添加可能出现问题的代码，如果try中出现问题，不会报错，不会阻塞程序运行
-
-## assert断言
-
-- 如果boolean表达式]为true，则程序继续执行。
-- 如果为false，则程序抛出AssertionError，并终止执行。
-- 可以输出到日志
-
 # 面向对象
 
 面向对象三大特征：**封装，继承，多态**
@@ -275,18 +321,26 @@ for( String name : names ) {
 Student xiaoming = new Student();
 ```
 
-## static/静态
+## static静态
 
 static表示静态，是Java中的一个修饰符，可以修饰成员方法，成员变量
 
 - 被static修饰的成员变量，叫做静态变量
-    - **被该类所有对象共享**（创建多个对象，但是内部的static变量是同一个）
-    - **不属于对象，属于类**
-    - **随着类的加载而加载，优先于对象存在**
+  - **被该类所有对象共享**（创建多个对象，但是内部的static变量是同一个）
+  - **不属于对象，属于类**
+  - **随着类的加载而加载，优先于对象存在**
 - 被static修饰的成员方法，叫做静态方法
-    - 多用在测试类和工具类中
-    - Javabean类中很少会用
-    - 使用类名可以直接调用
+  - 多用在测试类和工具类中
+  - Javabean类中很少会用
+  - 使用类名可以直接调用
+
+可以用于如下5个位置：
+
+- 静态变量（静态变量属于类，不需要实例化对象就能使用，它的值可以被当前类及其子类、以及这些类的所有实例对象共享）
+- 静态方法（静态方法属于类方法，不需要实例化对象就能调用）
+- 静态代码块（静态代码块只会在类被加载时执行且执行一次）
+- 静态内部类（静态内部类可以不依赖外部类实例对象而被使用，当在成员内部类中不需要访问外部类的实例成员时，就可以把成员内部类定义为静态内部类）
+- 静态导入（在当前类上方静态导入另一个类的静态成员后，当前类就可以直接使用另一个类的静态成员的简名称，而不需要加类名.）
 
 #### 静态变量
 
@@ -321,14 +375,6 @@ static{
 jvm也是一个相对完整的虚拟机，也是有 栈内存 堆内存（静态区） 方法区的
 
 静态方法不能访问非静态
-
-## 工具测试类/javabean
-
-- Javabean类  用来描述一类事物的类。比如，Student，Teacher，Dog，Cat等
-- 测试类  用来检查其他类是否书写正确，:带有main方法的类，是程序的入口
-- 工具类  不是用来描述一类事物的，而是帮我们做一些事情的类
-
-在其中**工具类**的区别最大，在工具类中，是用来提供方法的，不需要创建类的实例（创建对象），对类来说，使用**static**进行修饰
 
 ## 封装
 
@@ -394,7 +440,51 @@ public class Main {
 - protected 保护 在不同包下的无关类中不能使用
 - public 共有 在全部地方都能使用
 
-## extends/继承
+#### 构造函数
+
+常见的初始化类的函数，目的是初始化对象中的类的属性
+
+分为无参构造和有参构造
+
+一个构造实例
+
+```java
+public class student {
+    private string name;
+    public student(){} //空参构造
+    public student(string name){ //有参构造 
+        this.name = name
+    }
+}
+```
+
+在构造函数中必有
+
+- 够着函数名和类名必须相同
+
+**调用构造函数**
+
+直接new一个就行了
+
+```
+new LoginJFrame();//空参构造
+```
+
+#### 子类的构造过程
+
+子类继承父类后构造器的特点:
+
+- 子类中所有的构造器默认都会先访问父类中无参的构造器，再执行自己
+
+为什么?
+
+- 子类在初始化的时候，有可能会使用到父类中的数据，如果父类没有完成初始化，子类将无法使用父类的数据。子类初始化之前，一定要调用父类构造器先完成父类数据空间的初始化。
+
+怎么调用父类构造器的?
+
+- 子类构造器的第一行语句默认都是:super()，不写也存在
+
+## 继承
 
 子类继承父类中的属性和行为。子类对象具有与父类相同的属性和行为，子类可以直接访问父类中的**非私有**属性
 
@@ -445,7 +535,7 @@ public class People {
 }
 ```
 
-## this/super
+#### this/super
 
 - this表示本类对象（类似于指针，指向类自己）
 
@@ -461,167 +551,28 @@ public void setSchool(String school) {
 
 - super表示父类对象
 
-## 构造函数
+#### 多态向上/下转型
 
-常见的初始化类的函数，目的是初始化对象中的类的属性
+- **向上转型**（自动类型转换，默认）：安全转换
 
-分为无参构造和有参构造
+```
+父类类型 对象名称 = new 子类构造器
+```
 
-一个构造实例
+缺点：不能访问子类独有的方法和变量
 
-```java
-public class student {
-    private string name;
-    public student(){} //空参构造
-    public student(string name){ //有参构造 
-        this.name = name
-    }
+- **向下转型**（强制类型转化）：非安全转换
+
+能访问子类独有的方法和变量
+
+类型必须相同，可以使用`instanceof`判断当前对象的真实类型，再进行强制转换
+
+```
+变量名 instanceof 真实类型
+if（变量名 instanceof 真实类型）{
+	//执行的函数
 }
 ```
-
-在构造函数中必有
-
-- 够着函数名和类名必须相同
-
-**调用构造函数**
-
-直接new一个就行了
-
-```
-new LoginJFrame();//空参构造
-```
-
-## 重写和重载
-
-`方法重写`：子类中出现与父类一摸一样的方法时（**返回类型，方法名都相同**），会出现覆盖效果
-
-目的是 在父类方法的基础上添加更多的功能
-
-`方法重载`：方法名相同，方法参数类型或者个数不相同（返回值不考虑）
-
-跟重写特别想，就是添加了更多参数
-
-#### @Override/重写注解
-
-放在重写后的方法上，作为重写的校验注解，错误会出现提示
-
-## 子类的构造过程
-
-子类继承父类后构造器的特点:
-
-- 子类中所有的构造器默认都会先访问父类中无参的构造器，再执行自己
-
-为什么?
-
-- 子类在初始化的时候，有可能会使用到父类中的数据，如果父类没有完成初始化，子类将无法使用父类的数据。子类初始化之前，一定要调用父类构造器先完成父类数据空间的初始化。
-
-怎么调用父类构造器的?
-
-- 子类构造器的第一行语句默认都是:super()，不写也存在
-
-## abstract/抽象类和抽象方法
-
-是实现多态的基础，主要是抽象方法
-
-**抽象方法所在的类叫抽象类**
-
-在继承类的时候很有可能其中有函数用法不同，在继承时需要重写方法，抽象类在父类中不具体写实际的方法代码，强制要求子类继承抽象类重写其中的方法，否则直接报错
-
-**语法格式**
-
-- 抽象方法的定义格式
-
-```java
-public abstract 返回值类型 方法名（参数）; 
-```
-
-- 抽象类的定义格式
-
-```java
-public abstract class 类名{}
-```
-
-注意事项
-
-1. 抽象类不能创建对象，只能当父类让别的类继承，然后创建对象
-2. 在抽象类父类和子类中**都是抽象类**
-3. 一个类中如果定义了抽象方法，这个**类必须声明成抽象类**，否则报错。
-4. 抽象类**无法实例化，只能new具体的子类**，但是抽象类都可以具有成员**变量、方法、构造器**
-5. **抽象类中不一定有抽象方法，有抽象方法的类一定是抽象类。**
-6. 类继承了抽象父类，**则必须重写完抽象类的全部抽象方法，否则这个子类也必须定义成抽象类。**
-
-## interface/接口
-
-抽象类的拓展，抽象类中的继承子类必须重写完抽象类的全部抽象方法，但是有写方法是不需要的，****
-
-在idea中，接口的图标为一个绿色的 i
-
-**抽象类中的可选功能就可以单独定义成一个接口**
-
-**接口是抽象类的一个功能**
-
-**注意：接口不是抽象类，接口就是一种规则，是对行为的抽象，而且不要有命名冲突**
-
-定义接口
-
-```
-Pubilc interface 接口名 {}
-```
-
-- jdk8之前的只能是抽象方法和常量
-
-- 接口不能实例化
-
-- 接口的成员都是pubilc修饰的
-
-- 接口的子类(实现类)
-    要么重写接口中的所有抽象方法
-    要么是抽象类
-
-- 接口和类的实现关系，通过implements关键字表示，可以单实现，也可以多实现。
-
-    ```java
-    public class 类名 implements 接口名1，接口名2 {}
-    ```
-
-- 实现类还可以在继承一个类的同时实现多个接口。
-
-    ```java
-    public class 类名 extends 父类 implements 接口名1，接口名2 {}
-    ```
-
-- 一个类的实现接口，必须重写所有接口的全部抽象方法（不然会报错），否则这个类需要定义成抽象类
-
-**接口中成员的特点**
-
-- **成员变量**
-    只能是常量
-    默认修饰符：public static final
-- 构造方法
-    没有，创建不了对象，只能给类提供继承
-
-#### implements/接口实现
-
-声名一个类，做接口实现
-
-- EmployeeService是接口
-- EmployeeServiceImpl 是接口实现类
-
-```java
-public class EmployeeServiceImpl implements EmployeeService {
-
-}
-```
-
-实现接口的实现需要满足下面几点
-
-- **相同的函数名**：实现接口的方法必须与接口中声明的方法具有相同的函数名。
-
-- **相同的参数列表**：方法的参数列表（包括参数的类型和顺序）必须与接口中声明的方法一致。
-
-- **相同的返回类型**：方法的返回类型必须与接口中声明的方法一致。
-
-- **相同的修饰符**：方法的可见性修饰符必须与接口中声明的方法一致或更宽松（如从 `protected` 变为 `public`）。
 
 ## 多态
 
@@ -723,28 +674,127 @@ public class Main {
 猫吃鱼！
 ```
 
-#### 多态向上/下转型
+## 抽象类和抽象方法
 
-- **向上转型**（自动类型转换，默认）：安全转换
+是实现多态的基础，主要是抽象方法
+
+**抽象方法所在的类叫抽象类**
+
+在继承类的时候很有可能其中有函数用法不同，在继承时需要重写方法，抽象类在父类中不具体写实际的方法代码，强制要求子类继承抽象类重写其中的方法，否则直接报错
+
+**语法格式**
+
+- 抽象方法的定义格式
+
+```java
+public abstract 返回值类型 方法名（参数）; 
+```
+
+- 抽象类的定义格式
+
+```java
+public abstract class 类名{}
+```
+
+注意事项
+
+1. 抽象类不能创建对象，只能当父类让别的类继承，然后创建对象
+2. 在抽象类父类和子类中**都是抽象类**
+3. 一个类中如果定义了抽象方法，这个**类必须声明成抽象类**，否则报错。
+4. 抽象类**无法实例化，只能new具体的子类**，但是抽象类都可以具有成员**变量、方法、构造器**
+5. **抽象类中不一定有抽象方法，有抽象方法的类一定是抽象类。**
+6. 类继承了抽象父类，**则必须重写完抽象类的全部抽象方法，否则这个子类也必须定义成抽象类。**
+
+#### interface/接口
+
+抽象类的拓展，抽象类中的继承子类必须重写完抽象类的全部抽象方法，但是有写方法是不需要的，****
+
+在idea中，接口的图标为一个绿色的 i
+
+**抽象类中的可选功能就可以单独定义成一个接口**
+
+**接口是抽象类的一个功能**
+
+**注意：接口不是抽象类，接口就是一种规则，是对行为的抽象，而且不要有命名冲突**
+
+定义接口
 
 ```
-父类类型 对象名称 = new 子类构造器
+Pubilc interface 接口名 {}
 ```
 
-缺点：不能访问子类独有的方法和变量
+- jdk8之前的只能是抽象方法和常量
 
-- **向下转型**（强制类型转化）：非安全转换
+- 接口不能实例化
 
-能访问子类独有的方法和变量
+- 接口的成员都是pubilc修饰的
 
-类型必须相同，可以使用`instanceof`判断当前对象的真实类型，再进行强制转换
+- 接口的子类(实现类)
+    要么重写接口中的所有抽象方法
+    要么是抽象类
 
-```
-变量名 instanceof 真实类型
-if（变量名 instanceof 真实类型）{
-	//执行的函数
+- 接口和类的实现关系，通过implements关键字表示，可以单实现，也可以多实现。
+
+    ```java
+    public class 类名 implements 接口名1，接口名2 {}
+    ```
+
+- 实现类还可以在继承一个类的同时实现多个接口。
+
+    ```java
+    public class 类名 extends 父类 implements 接口名1，接口名2 {}
+    ```
+
+- 一个类的实现接口，必须重写所有接口的全部抽象方法（不然会报错），否则这个类需要定义成抽象类
+
+**接口中成员的特点**
+
+- **成员变量**
+    只能是常量
+    默认修饰符：public static final
+- 构造方法
+    没有，创建不了对象，只能给类提供继承
+
+#### implements/接口实现
+
+声名一个类，做接口实现
+
+- EmployeeService是接口
+- EmployeeServiceImpl 是接口实现类
+
+```java
+public class EmployeeServiceImpl implements EmployeeService {
+
 }
 ```
+
+实现接口的实现需要满足下面几点
+
+- **相同的函数名**：实现接口的方法必须与接口中声明的方法具有相同的函数名。
+
+- **相同的参数列表**：方法的参数列表（包括参数的类型和顺序）必须与接口中声明的方法一致。
+
+- **相同的返回类型**：方法的返回类型必须与接口中声明的方法一致。
+
+- **相同的修饰符**：方法的可见性修饰符必须与接口中声明的方法一致或更宽松（如从 `protected` 变为 `public`）。
+
+## 重写和重载
+
+`方法重写`：子类中出现与父类一摸一样的方法时（**返回类型，方法名都相同**），会出现覆盖效果
+
+目的是 在父类方法的基础上添加更多的功能
+
+`方法重载`：方法名相同，方法参数类型或者个数不相同（返回值不考虑）
+
+跟重写特别想，就是添加了更多参数
+
+#### @Override/重写注解
+
+放在重写后的方法上，作为重写的校验注解，错误会出现提示
+
+- 
+
+- 
 
 ## 内部类
 
@@ -867,14 +917,14 @@ for(int i=0; i<vec.size(); i++){
 成员结构如下，包含关系
 
 - Collection
-    - List
-        - ArrayList：动态数组，类型不能是基本类型（对象），如 int 转为 Integer，中间插入慢，高效随机访问和快速尾部插入
-        - LinkedList：双向链表，通过指针连接，高效插入和删除，迭代器性能好，随机访问较慢
-        - Vector（弃用）：由于向量（vector）不是线程安全的并且效率较低，因此建议使用ArrayList代替Vector。
-    - Set
-        - HashSet：无序集合，基于HashMap实现，高效的查找和插入操作
-            - LinkedHashSet
-        - TreeSet：TreeSet 是有序集合，底层基于红黑树实现，不允许重复元素。提供自动排序功能，适用于需要按顺序存储元素的场景。性能相对较差，不允许插入 null 元素。
+  - List
+    - ArrayList：动态数组，类型不能是基本类型（对象），如 int 转为 Integer，中间插入慢，高效随机访问和快速尾部插入
+    - LinkedList：双向链表，通过指针连接，高效插入和删除，迭代器性能好，随机访问较慢
+    - Vector（弃用）：由于向量（vector）不是线程安全的并且效率较低，因此建议使用ArrayList代替Vector。
+  - Set
+    - HashSet：无序集合，基于HashMap实现，高效的查找和插入操作
+      - LinkedHashSet
+    - TreeSet：TreeSet 是有序集合，底层基于红黑树实现，不允许重复元素。提供自动排序功能，适用于需要按顺序存储元素的场景。性能相对较差，不允许插入 null 元素。
 
 ##### List接口(有序集合)
 
@@ -988,266 +1038,20 @@ public class MyArrayList {
 
 1. 在类实现接口时直接指定
 
-    ```java
-    public class MyarrayList implements List<string>{ 
-    
-    }
-    ```
+   ```java
+   public class MyarrayList implements List<string>{ 
+   
+   }
+   ```
 
 2. 在创建对象时指定，**泛型延续**
 
-    ```java
-    public class MyarrayList implements List<T>{ 
-    
-    }
-    MyarrayList myarrayList = new MyarrayList();
-    ```
-
-# 内置对象
-
-## Object
-
-java中的顶级父类，所有的类都直接或间接继承Object类
-
-Object类中的方法可以被所有的子类访问，也就是所有类
-
-#### 构造与成员方法
-
-在Object中只有无参构造
-
-Object的成员方法
-
-| 方法名                            | 说明                     |
-| --------------------------------- | ------------------------ |
-| public string toString()          | 返回对象的字符串表示形式 |
-| public boolean equals(object obj) | 比较两个对象是否相等     |
-| protected object clone(int a)     | 对象克隆                 |
-
-#### toString重写
-
-一般来说，会重写类中的toString方法，常用lombok，ptg插件
-
-- 直接使用toString
-
-```java
-Count count = new Count();
-String str1 = count.toString();
-System.out.println(str1);
-```
-
-打印结果
-
-```
-cc.liyinghao.Count@10f87f48
-```
-
-为包名类名 @分隔符 加处理过的地址值，这对开发者意义不大需要重写为字符串拼接
-
-```java
-@Override
-public String toString() {
-    return "Count{x = " + x + "}";
-}
-```
-
-#### equals重写
-
-Object中的对象对比方法，默认使用时会对比地址值，内容相同但地址不同也会返回falsh，一般需要重写，重写后就是内部属性值了
-
-**快捷键 Alt+Ins**
-
-```java
-@Override
-public boolean equals(Object o) {
-    if (this == o) return true;//如果地址相同就直接返回
-    if (o == null || getClass() != o.getClass()) return false;
-    Count count = (Count) o;
-    return x == count.x;
-}
-
-@Override
-public int hashCode() {
-    return Objects.hashCode(x);
-}
-```
-
-#### clone()重写
-
-对象克隆，也叫对象拷贝，对象复制
-
-在java中clone是受保护的方法，需要**重写**，使用Alt+Ins快捷键可以重写
-
-```java
-@Override
-protected Object clone() throws CloneNotSupportedException {
-    return super.clone();
-}
-```
-
-之后还需要标记克隆类
-
-```java
-public class Count  implements Cloneable 
-```
-
-在调用时还需要抛错
-
-#### 深浅拷贝
-
-- 浅拷贝
-
-    默认的克隆的是相同的地址，指向同一块内存，当有一方改变时，另一个也会改变
-
-- 深拷贝
-
-    推荐使用第三方库进行拷贝，自己写在遇到多维数组时比较困难
-
-#### Objects工具类
-
-Objects是一个工具类，提供一些方法去实现功能
-
-如过对象的值为null 代表什么都没有，也没有方法，无法调用
-
-Objects会判断对象是否为空，之后进行判断，就不会产生空指针异常了
-
-| 方法名                                          | 说明                                     |
-| ----------------------------------------------- | ---------------------------------------- |
-| public static boolean equals(object a,object b) | 先做非空判断，之后比较两个对象           |
-| public static boolean isNull(object obj)        | 判断对象是否为nu11，为null返回true，反之 |
-| public static boolean nonNull(object obj)       | 判断对象是否为nu11，跟isNu11的结果相反   |
-
-示例：
-
-```java
-Count count = new Count(1);
-Count count1 = null;
-boolean result = Objects.equals(count, count1);
-System.out.println(result);
-```
-
-## Biglnteger
-
-java有四种类型，byte，short，int，long 分别为 1 2 4 8 个字节 存储范围都有线
-
-Biglnteger表示整数类型，非常非常大，可以近似看成无限的
-
-**Biglnteger对象一旦创建，不能修改记录的值，每一次都会新建一个新的Biglnteger对象**
-
-| 方法名                                     | 说明                                                       |
-| ------------------------------------------ | ---------------------------------------------------------- |
-| public BigInteger(int num public Random r) | 获取随机大整数，范围：[ 0~2的num次方-1 ] 包含0~2 num次方-1 |
-| public BigInteger(string val)              | 获取指定的大整数，传入的必须为字符，且必须为数字           |
-| public BigInteger(string val,int radix)    | 获取指定进制的大整数                                       |
-
-还有常用方法 
-
-- 静态方法获取BigInteger的对象，有内部优化，对-16~16这个范围的数字有优化
-
-    ```java
-    public static BigInteger valueOf(Long val)
-    ```
-
-    警告：这个方法只能获取Long范围之内的，大了会报错
-
-#### Biglnteger方法
-
-| 方法名                                                 | 说明                                  |
-| ------------------------------------------------------ | ------------------------------------- |
-| public BigInteger add(BigInteger val)                  | 加法                                  |
-| public BigInteger subtract(BigInteger val)             | 减法                                  |
-| public BigInteger multiply(BigInteger val)             | 乘法                                  |
-| public BigInteger divide(BigInteger val)               | 除法，获取商                          |
-| public BigInteger[] divideAndRemainder(BigInteger val) | 除法，获取商和余数                    |
-| public BigInteger max/min(BigInteger val)              | 返回较大值/较小值                     |
-| public BigInteger pow(int exponent)                    | 次幂                                  |
-| publicboolean equals(object x)                         | 比较是否相同                          |
-| publicint intValue(BigInteger val)/longValue           | 转为int类型整数，超出范围数据丢失精度 |
-
-## BigDecimal 高精度数字
-
-适合金融、科学计算等对数值精度要求很高的场景。它是 `java.math` 包的一部分。
-
-在java中
-
-- float 4个字节 32个总bit位 小数部分23个bit位
-- double 8个字节 64个比特位 小数部分52个bit位 
-
-如果超出了这些比特位，只能舍弃，出现精度丢失
-
-通过字符串创建BigDecimal
-
-```java
-BigDecimal bd1 = new BigDecimal("23.55");
-```
-
-#### BigDecima方法
-
-| 方法名                                                       | 说明     |
-| ------------------------------------------------------------ | -------- |
-| public static BigDecimal value0f(double val)                 | 获取对象 |
-| public BigDecimal add(BigDecimal val)                        | 加法     |
-| public BigDecimal subtract(BigDecimal val)                   | 减法     |
-| public BigDecimal multiply(BigDecimal val)                   | 乘法     |
-| public BigDecimal divide(BigDecimal val)                     | 除法     |
-| public BigDecimal divide(BigDecimal val，精确几位，舍入模式) | 除法     |
-
-#### 注意事项
-
-1. **避免直接使用浮点数初始化：**
-    - 不推荐：`new BigDecimal(0.1)`
-    - 推荐：`BigDecimal.valueOf(0.1)` 或 `new BigDecimal("0.1")`
-2. **`BigDecimal` 是不可变对象：** 每次运算都会返回新对象，需注意避免多次运算带来的性能开销。
-3. **合理选择精度和舍入模式：** 金融计算中建议明确指定 `scale` 和 `RoundingMode`。
-
-## StingBuild/StringBuffer
-
-可变的字符串类，两个类是中的方法是相同的，唯一的区别为StingBuild线程不安全，适用于需要频繁修改字符串内容的场景。StringBuffer线程安全
-
-## File
-
-进行文件操作，本身是一个对象，通过调用对象中的方法进行fs操作(File System)
-
-#### File构造
-
-只推荐使用java，避免使用字符串拼接，在linux和win平台的文件路径是不同的\linux /win
-
-**在JWM中会根据底层系统自动修改路径符，无需考虑**
-
-```java
-String str = "C:\\Users\\liyinghao\\Desktop\\test.txt";
-File file = new File(str);
-
-String parent = "C:\\Users\\liyinghao\\Desktop";
-File parentFile = new File(parent);
-System.out.println(file.getParentFile().equals(parentFile));
-```
-
-#### 路径选择
-
-在java中是可以使用相对路径的，不能使用./直接写 xxx/xxx.x 就在jar包运行的路径上
-
-**警告：在创建文件时，没有父级目录无法创建**
-
-```java
-String str = "static/index.js";
-File file = new File(str);
-try {//创建文件
-    file.createNewFile();
-} catch (Exception e) {
-    e.printStackTrace();
-}
-```
-
-## Scanner输入
-
-和cin一样，用处不大
-
-```java
-Scanner scanner = new Scanner(System.in);
-System.out.println("Enter the radius of the circle: ");
-String input = scanner.nextLine();
-System.out.println("The radius of the circle is: " + input);
-```
+   ```java
+   public class MyarrayList implements List<T>{ 
+   
+   }
+   MyarrayList myarrayList = new MyarrayList();
+   ```
 
 # io流文件读写
 
@@ -1399,8 +1203,8 @@ java中的问题分文为两种
 
 - **Error：**错误，系统级，严重问题，程序员无法也无需管理
 - **Exception：**异常，表程序出现的问题，分为两类。Exception为全部类的异常类的父类
-    - **RuntimeException：**运行时异常，编译阶段不会出现异常提醒。运行时出现的异常(如:数组索引越界异常)
-    - **编译时异常：**编译阶段就会出现异常提醒的。(如:日期解析异常)
+  - **RuntimeException：**运行时异常，编译阶段不会出现异常提醒。运行时出现的异常(如:数组索引越界异常)
+  - **编译时异常：**编译阶段就会出现异常提醒的。(如:日期解析异常)
 
 ## throw(s)抛出异常
 
@@ -1408,21 +1212,21 @@ java中的问题分文为两种
 
 - throws：写在方法定义处，表示声明一个异常，告诉调用者，使用本方法可能会有哪些异常，编译时异常:必须要写，运行时异常:可以不写。
 
-    ```java
-    public class Main {
-        public static void main(String[] args) throws Exception {
-            
-        }
-    }
-    ```
+  ```java
+  public class Main {
+      public static void main(String[] args) throws Exception {
+          
+      }
+  }
+  ```
 
 - throw：写在方法内，结束方法，手动抛出异常对象，交给调用者，方法中下面的代码不再执行了，相当于return
 
-    ```java
-    public void 方法(){
-        throw new NullPointerException()
-    }
-    ```
+  ```java
+  public void 方法(){
+      throw new NullPointerException()
+  }
+  ```
 
 直接创建对象并抛出是更常见的做法
 
@@ -1437,10 +1241,10 @@ throw new RuntimeException("a>5");
 有两种处理方式
 
 - JVM默认处理方式
-    1. 把异常的名称原因等输出在控制台
-    2. 停止执行，异常下的代码不会执行了
+  1. 把异常的名称原因等输出在控制台
+  2. 停止执行，异常下的代码不会执行了
 - 自定义方式
-    1. try{}catch(对应的异常){}，在try中的错误抛出后程序还能继续允行，如果多个异常，就接上多个catch或者（|单个！），父类一定要写在下面，try中遇到了问题，try中后的代码就不会执行了 ctrl+Alt+t自动生成
+  1. try{}catch(对应的异常){}，在try中的错误抛出后程序还能继续允行，如果多个异常，就接上多个catch或者（|单个！），父类一定要写在下面，try中遇到了问题，try中后的代码就不会执行了 ctrl+Alt+t自动生成
 
 ## Throwable异常处理
 
@@ -1458,8 +1262,8 @@ Throwable 的成员方法
 
 1. 定义异常类
 2. 写继承关系
-    - 运行时异常：RuntimeException
-    - 编译时异常：Exception
+   - 运行时异常：RuntimeException
+   - 编译时异常：Exception
 3. 空参构造 Alt+ins快速生成
 4. 带参构造
 
@@ -1547,69 +1351,69 @@ public class BaseException extends RuntimeException {
 
 1. 声明接口
 
-    接口与实现类
+   接口与实现类
 
-    ```java
-    public interface Start {
-        public String sing(String singName); //接口中都是抽象方法
-    }
-    @Data
-    public class JG implements Start {
-        private String name;
-    
-        @Override
-        public String sing(String singName) {
-            System.out.println(this.name + " am singing!" + singName);
-            return "I am singing!";
-        }
-    }
-    ```
+   ```java
+   public interface Start {
+       public String sing(String singName); //接口中都是抽象方法
+   }
+   @Data
+   public class JG implements Start {
+       private String name;
+   
+       @Override
+       public String sing(String singName) {
+           System.out.println(this.name + " am singing!" + singName);
+           return "I am singing!";
+       }
+   }
+   ```
 
 2. 声明代理类
 
-    其中核心函数为Proxy.newProxyInstance创建代理对象
+   其中核心函数为Proxy.newProxyInstance创建代理对象
 
-    ```java
-    public class ProxyUtil {
-    
-        public static Start createPoxy(JG jg) {
-            /**
-             * 生成代理对象
-             * 参数1：指定被代理对象的类加载器
-             * 参数2：指定被代理对象的接口，用于指定代理的方法
-             * 参数3：指定代理对象做什么事情
-             *
-             * 外部使用代理对象
-             * 1.获取代理对象
-             *   Start start = ProxyUtil.createPoxy(new JG());
-             * 2.调用代理对象的方法
-             *   代理对象.方法();
-             */
-            Start start = (Start) Proxy.newProxyInstance(
-                    ProxyUtil.class.getClassLoader(),
-                    new Class[]{Start.class},//代理对象实现的接口
-                    new InvocationHandler() {
-                        @Override
-                        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                            /**
-                             * 参数1.代理的对象
-                             * 参数2.要运行的方法
-                             * 参数3.方法的参数
-                             */
-                            if("sing".equals(method.getName())) {
-                                System.out.println("before sing");
-                                Object result = method.invoke(jg, args);
-                                System.out.println("after sing");
-                                return result;
-                            }
-                            return null;
-                        }
-                    }
-            );
-            return start;
-        }
-    }
-    ```
+   ```java
+   public class ProxyUtil {
+   
+       public static Start createPoxy(JG jg) {
+           /**
+            * 生成代理对象
+            * 参数1：指定被代理对象的类加载器
+            * 参数2：指定被代理对象的接口，用于指定代理的方法
+            * 参数3：指定代理对象做什么事情
+            *
+            * 外部使用代理对象
+            * 1.获取代理对象
+            *   Start start = ProxyUtil.createPoxy(new JG());
+            * 2.调用代理对象的方法
+            *   代理对象.方法();
+            */
+           Start start = (Start) Proxy.newProxyInstance(
+                   ProxyUtil.class.getClassLoader(),
+                   new Class[]{Start.class},//代理对象实现的接口
+                   new InvocationHandler() {
+                       @Override
+                       public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                           /**
+                            * 参数1.代理的对象
+                            * 参数2.要运行的方法
+                            * 参数3.方法的参数
+                            */
+                           if("sing".equals(method.getName())) {
+                               System.out.println("before sing");
+                               Object result = method.invoke(jg, args);
+                               System.out.println("after sing");
+                               return result;
+                           }
+                           return null;
+                       }
+                   }
+           );
+           return start;
+       }
+   }
+   ```
 
 ## 调用代理类
 
@@ -1959,7 +1763,36 @@ for (int i = 0; i < 10; i++) {
 
 在同一个任务中开多线程执行就很有可能有线程重复问题，使用static也无法解决
 
-需要同步代码块
+需要同步代码块，或使用线程安全的类
+
+非线程安全示例
+
+```java
+public class NonThreadSafeExample {
+    private static int counter = 0;
+
+    public static void main(String[] args) throws InterruptedException {
+        Runnable task = () -> {
+            for (int i = 0; i < 1000; i++) {
+                counter++; // 非线程安全
+            }
+        };
+
+        Thread t1 = new Thread(task);
+        Thread t2 = new Thread(task);
+
+        t1.start();
+        t2.start();
+
+        t1.join();
+        t2.join();
+
+        System.out.println("Final Counter Value (Non Thread-Safe): " + counter);
+    }
+}
+```
+
+**输出可能会小于 2000**，因为多个线程会同时访问和修改 `counter`，导致数据竞争问题。
 
 #### synchronized同步代码块
 

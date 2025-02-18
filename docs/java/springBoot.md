@@ -98,57 +98,6 @@ spring框架提供， 通用的返回实体，目的是设置返回给前端的�
     ResponseEntity.badRequest().body(message);
     ```
 
-
-# 工具注解
-
-## 时间格式化
-
-#### 注解格式
-
-使用 @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-
-直接在想要改变格式的类的属性上添加
-
-```java
-@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-private LocalDateTime createTime;
-```
-
-#### 扩展消息转换器转换时间
-
-可以在 WebMvcConfiguration 中扩展Spring MVC的消息转换器，统一对日期类型进行格式化处理
-
-## @Pattern正则
-
-在类的属性上添加
-
-```java
-@Pattern(regexp = "^\\d{3}$", message = "用户名必须是1到3位的字母或数字")
-private String name;
-```
-
-之后在获取请求时添加@Vali验证字段
-
-```java
-@PostMapping("/Pattern")
-public String hello(@Valid @RequestBody Business business) {
-  log.info(business.toString());
-  return "ok";
-}
-```
-
-如何验证失败，会抛出异常，使用全局异常处理器处理
-
-## @JsonFormat时间格式
-
-修改返回给前端的时间格式
-
-```java
-/** 创建时间 */
-@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-private LocalDateTime createdAt;
-```
-
 # IOC-DI依赖注入控制反转
 
 spring中的核心概念，**目的是降低代码的耦合度，使引入更加灵活**
@@ -170,7 +119,23 @@ spring中的核心概念，**目的是降低代码的耦合度，使引入更加
 
 在运行框中的Actuator中Bean  白色的就是自己的bean
 
-## bean声明
+## bean组件扫描
+
+bean要想生效，还需要被组件扫描注解@ComponentScan扫描。在main函数上添加
+
+```java
+@SpringBootApplication  //默认扫描当前包及其子包
+```
+
+@Componentscan注解虽然没有显式配置，但是实际上已经包含在了启动类声明注解 @SpringBootApplication中，默认扫描的范围是
+
+**！启动类所在包及其子包(在多模块开发时非常重要，以package命为例，扫描当前包及其子包)**。
+
+其他地方也可以，但是需要配置
+
+## @Component声明bean
+
+目的是让spring自动创建并管理bean，为自己写的bean
 
 Component为主注解，其他三个为衍生注解，功能是一样的
 
@@ -186,21 +151,41 @@ Component为主注解，其他三个为衍生注解，功能是一样的
 - bean是有名字的，声明bean的时候，可以通过value属性指定bean的名字，如果没有指定，默认为类名首字母小写。
 - 使用以上四个注解都可以声明bean，但是在springboot集成web开发中，声明控制器bean只能用@Controller
 
-## bean组件扫描
+## @Configuration三方bean
 
-前面声明bean的四大注解，要想生效，还需要被组件扫描注解@ComponentScan扫描。
+如果要管理的bean对象来自于第三方，是无法用 @Component及衍生注解声明bean的，就需要用到 @Bean 注解来控制返回的对象
 
-在main函数下
+适用于 **不能修改源码的类**（如 **第三方类**），或 **需要自定义 Bean 创建逻辑** 时使用
+
+#### @Bean
+
+在config包下建立CommonConfig类 声明为 @Configuration  配置类
 
 ```java
-@SpringBootApplication  //默认扫描当前包及其子包
+@Configuration //配置类
+public class CommonConfig{
+    //声明第三方bean
+    @Bean //将当前方法的返回值对象交给IOC容器管理，成为IOC容器bean
+    public SAXReader saxReader (){
+        return new SAXReader();
+    }
+}
 ```
 
-@Componentscan注解虽然没有显式配置，但是实际上已经包含在了启动类声明注解 @SpringBootApplication中，默认扫描的范围是
+在配置类注解下，springBoot会自动创建@Bean下的对象并将返回的对象交给IOC容器管理
 
-**！启动类所在包及其子包(在多模块开发时非常重要，以package命为例，扫描当前包及其子包)**。
+通过@Bean注解的name/value属性指定bean名称，如果未指定，默认是方法名
 
-翻译过来就是需要在main文件同级包下才会生效，其他地方也可以，但是需要配置
+如果第三方bean需要依赖其它bean对象，直接在bean定义方法中设置形参即可，容器会根据类型自动装配。
+
+```java
+Object saxReader = applicationContext.getBean("saxReader");
+```
+
+**补：**@Component 及衍生注解 与 @Bean注解使用场景?
+
+- 项目中自定义的，使用@Componznt及其衍生注解
+- 项目中引入第三方的，使用@Bean注解
 
 ## bean注入
 
@@ -228,6 +213,8 @@ private MyBean myBean;
 
 ##### 设置非必要注入
 
+如果某个bean找不到也不报错，可以正常编译时使用
+
 ```java
 @Autowired(required = false)
 ```
@@ -249,7 +236,7 @@ java语言本体的依赖注入方式，属于javaEE规范，使用于全部的j
 private MyBean myBean;
 ```
 
-## 构造函数注入对象
+#### 构造函数注入对象
 
 也是spring团队推荐的一种方式
 
@@ -326,39 +313,18 @@ prototype的bean，每一次使用该bean的时候都会创建一个新的实例
 | session     | 每个会话范围内会创建新的实例(web环境中，了解)  |
 | application | 每个应用范围内会创建新的实例(web环境中，了解)  |
 
-#### @Configuration配置类/第三方bean管理
+## 生命周期
 
-如果要管理的bean对象来自于第三方，是无法用 @Component及衍生注解声明bean的，就需要用到 @Bean 注解来控制返回的对象
+#### @PostConstruct容器初始化完成后
 
-##### @Bean
-
-在config包下建立CommonConfig类 声明为 @Configuration  配置类
+在 Spring 容器初始化完成后自动执行方法常见于初始化数据库，配置数据库
 
 ```java
-@Configuration //配置类
-public class CommonConfig{
-    //声明第三方bean
-    @Bean //将当前方法的返回值对象交给IOC容器管理，成为IOC容器bean
-    public SAXReader saxReader (){
-        return new SAXReader();
-    }
-}
+@PostConstruct
+public void init() {}
 ```
 
-在配置类注解下，springBoot会自动创建@Bean下的对象并将返回的对象交给IOC容器管理
 
-通过@Bean注解的name/value属性指定bean名称，如果未指定，默认是方法名
-
-如果第三方bean需要依赖其它bean对象，直接在bean定义方法中设置形参即可，容器会根据类型自动装配。
-
-```java
-Object saxReader = applicationContext.getBean("saxReader");
-```
-
-**补：**@Component 及衍生注解 与 @Bean注解使用场景?
-
-- 项目中自定义的，使用@Componznt及其衍生注解
-- 项目中引入第三方的，使用@Bean注解
 
 # springMVC
 
@@ -613,34 +579,372 @@ public String json(@RequestBody User user){
 @RequestBody Map<String, String> requestBody
 ```
 
-## @Builder构建器注解
+## 参数格式化与校验
 
-另一种构建方式，写法不同
+#### 时间格式化
 
-在类头加上@Builder注解开启功能
+##### @JsonFormat
 
-之后使用类似，上下两个代码的含义是一样的
+使用 @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss") 修改返回给前端的时间格式
+
+直接在想要改变格式的类的属性上添加
 
 ```java
-//        Employee employee = new Employee();
-//        employee.setId(id);
-//        employee.setStatus(status);
-
-Employee employee = Employee.builder()
-    .status(status)
-    .id(id)
-    .build();
+@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+private LocalDateTime createTime;
 ```
 
-# 生命周期
+#### 扩展消息转换器转换时间
 
-## @PostConstruct容器初始化完成后
+可以在WebMvcConfiguration中扩展Spring MVC的消息转换器，统一对日期类型进行格式化处理
 
-在 Spring 容器初始化完成后自动执行方法常见于初始化数据库，配置数据库
+#### @Pattern正则
+
+在类的属性上添加
 
 ```java
-@PostConstruct
-public void init() {}
+@Pattern(regexp = "^\\d{3}$", message = "用户名必须是1到3位的字母或数字")
+private String name;
+```
+
+之后在获取请求时添加@Vali验证字段
+
+```java
+@PostMapping("/Pattern")
+public String hello(@Valid @RequestBody Business business) {
+  log.info(business.toString());
+  return "ok";
+}
+```
+
+如何验证失败，会抛出异常，使用全局异常处理器处理
+
+#### @Valid/@Validated参数校验
+
+```java
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @PostMapping("/register")
+    public String register(@Valid @RequestBody User user) {
+        return "注册成功";
+    }
+}
+
+@Data
+class User {
+    @NotBlank(message = "用户名不能为空")
+    private String name;
+
+    @Email(message = "邮箱格式不正确")
+    private String email;
+}
+```
+
+#### @Email/@NotBlank校验包
+
+邮箱验证/非空验证等，来自spring-boot-starter-validation包，默认不提供(jdk 17)
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
+
+**常见的校验注解**（`jakarta.validation.constraints` 包）
+
+| 注解                            | 作用                                          |
+| ------------------------------- | --------------------------------------------- |
+| `@NotNull`                      | 字段不能为 `null`（但可以是 `""` 空字符串）   |
+| `@NotBlank`                     | 不能为 `null` 且 **必须包含至少一个非空字符** |
+| `@NotEmpty`                     | 不能为 `null` 且 **长度必须大于 0**           |
+| `@Size(min=, max=)`             | 字符串、集合等的长度限制                      |
+| `@Pattern(regexp=)`             | 使用正则表达式校验格式                        |
+| `@Email`                        | 校验邮箱格式                                  |
+| `@Min(value=)` / `@Max(value=)` | 校验数字最小/最大值                           |
+| `@Positive` / `@Negative`       | 数值必须为正数/负数                           |
+
+#### 补：拦截校验
+
+@ExceptionHandler(value = MethodArgumentNotValidException.class) 可以专门捕获
+
+```java
+@ExceptionHandler(value = MethodArgumentNotValidException.class)
+public Object validationException(MethodArgumentNotValidException e, HttpServletRequest request) {
+    log.error("未处理异常 -> {}", e.getClass());
+    log.error("url -> {}", request.getRequestURL());
+    log.error("msg -> {}", e.getBindingResult().getFieldError().getDefaultMessage());
+    log.error("stack trace -> {}", e.getStackTrace());
+    return ResultUtil.Fail(e.getBindingResult().getFieldError().getDefaultMessage());
+}
+```
+
+## MultipartFile文件上传
+
+在springMVC 中封装好了文件上传类 MultipartFile，直接就可以进行文件获取
+
+1. 直接在参数中设置注解获取file请求体
+
+    ```java
+    @RequestParam("file") MultipartFile file
+    ```
+
+2. 设置文件保存路劲
+
+    ```java
+    File dest = new File("C:\\Users\\35687\\Desktop\\java测试\\File\\" + file.getOriginalFilename());
+    ```
+
+3. 使用file.transferTo(dest);保存文件
+
+#### 上传单个文件
+
+```java
+@RestController
+@Slf4j
+public class MainController {
+    @PostMapping("/upload")
+    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return "Please select a file to upload.";
+        }
+        try {
+            // 获取文件的字节流并保存到本地
+            //byte[] bytes = file.getBytes();
+            File dest = new File("C:\\Users\\35687\\Desktop\\java测试\\File\\" + file.getOriginalFilename());
+            file.transferTo(dest);
+            return "File uploaded successfully: " + file.getOriginalFilename();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "File upload failed: " + e.getMessage();
+        }
+    }
+}
+```
+
+#### 上传单个文件带参
+
+直接使用 @RequestParam 就能获取，需要和前端名称保持一致
+
+```java
+@PostMapping("/File")
+public String multipartFileTest(@RequestParam("file") MultipartFile file,@RequestParam String username,@RequestParam String email) throws Exception{
+    System.out.println("username: " + username);
+    System.out.println("email: " + email);
+    try {
+        // 获取文件的字节流并保存到本地
+        File dest = new File("/Users/liyinghao/Documents/学校课程/java作业/homeWorlForJavaWeb/java/static/" + file.getOriginalFilename());
+        file.transferTo(dest);
+        return "File uploaded successfully: " + file.getOriginalFilename();
+    } catch (IOException e) {
+        e.printStackTrace();
+        return "File upload failed: " + e.getMessage();
+    }
+}
+```
+
+#### 上传单个文件,包含其它请求实体
+
+```java
+@PostMapping
+public String multipartFileTest(@RequestParam MultipartFile multipartFile,@ApiParam(value = "用户名") @Valid UserDO userDO) throws Exception{
+    File file = new File("E:\\data\\test\\testFile");
+    multipartFile.transferTo(file);
+    return  userDO.toString();
+}
+```
+
+#### 多文件上传
+
+直接使用数组MultipartFile[] 接收就ok
+
+```java
+@PostMapping
+public JSONObject multipartFileTest(@RequestParam MultipartFile [] multipartFiles) throws Exception{
+    JSONObject jsonObject = new JSONObject();
+  	//之后可以遍历存储
+     for (MultipartFile file : files) {
+        jsonObject.put("file" + i, multipartFiles[i].getSize());
+    }
+    return jsonObject;
+}
+```
+
+#### 多文件夹保存
+
+可以实现嵌套文件夹的保存，空文件不保存
+
+```java
+@PostMapping("/api/upload")
+public String upload(@RequestParam("files") MultipartFile[] files) throws IOException {
+    String rootDir = "C:/Users/35687/Desktop/tt/";
+    for (MultipartFile file : files) {
+        log.info("文件上传{}", file.getOriginalFilename());
+        if (!file.isEmpty()) {
+            String relativePath = file.getOriginalFilename();// 获取文件的相对路径（例如：学生证/student.jpg）
+            File destFile = new File(rootDir + relativePath);// 创建目标文件对象
+            File parentDir = destFile.getParentFile();// 获取目标文件的父目录
+            if (!parentDir.exists()) {// 如果父目录不存在，创建它
+                parentDir.mkdirs();
+            }
+            file.transferTo(destFile);// 保存文件
+        }
+    }
+    return "Files uploaded successfully!";
+}
+```
+
+## 配置上传文件大小
+
+在配置文件中配置
+
+```
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+```
+
+## @ModelAttribute封装上传参数
+
+前端的Content-Type: **multipart/form-data **  可以直接使用@ModelAttribute获取
+
+```java
+public String multipartFileTest(@ModelAttribute User user) {
+    String username = user.getUsername();
+    String email = user.getPassword();
+    MultipartFile file = user.getFile();
+}
+```
+
+user类
+
+```java
+@Data
+public class User {
+
+    private String username;
+
+    private String password;
+
+    private MultipartFile file;
+}
+```
+
+## 文件上传API
+
+#### 限制文件大小
+
+无需获取文件大小，推荐直接在配置文件种进行限制，见上文
+
+#### 保存文件
+
+```java
+// 设置文件保存路径，使用自定义文件名
+File dest = new File("/Users/liyinghao/Documents/学校课程/java作业/homeWorlForJavaWeb/java/static/" + newFilename);
+// 保存文件
+file.transferTo(dest);
+```
+
+#### 获取文件大小
+
+```java
+byte[] bytes = file.getBytes();
+```
+
+#### 获取文件数量
+
+获取files中的文件数量，不包括文件夹
+
+```java
+files.length
+```
+
+#### 获取文件名称
+
+获取第一个文件名称，不是文件夹名称！
+
+```java
+files[0].getOriginalFilename(); //files操作
+file.getOriginalFilename() //file操作
+```
+
+#### 获取文件路径(文件夹名称)
+
+```java
+file.getOriginalFilename();
+```
+
+这个API是可以获取到文件夹名称的
+
+如用户上传的文件夹为 a/public/index.html
+
+在file.getOriginalFilename();中会完整显示
+
+#### 获取文件父路径
+
+```java
+File destFile = new File(rootDir + relativePath);// 创建目标文件对象
+File parentDir = destFile.getParentFile();// 获取目标文件的父目录
+```
+
+## 图片回显与保存路径问题
+
+有很多种图片回显方式，使用static文件夹直接访问，默认无需配置，是自动开启的，开发的时候可以用
+
+ 在springboot中有 main-->resources-->static
+
+在static中的文件可以直接访问
+
+如static/1.jpg
+
+前端的url就可以是 http://127.0.0.1:8080/1.jpg
+
+在java打包后新加入的图片无法回显！！打包后就没有resources路径了
+
+打包后的图片也会直接打包到jar包中
+
+保存设置无法使用相对路径
+
+**而且如果父路径不存在，那么并不会保存文件！**
+
+#### 设置相对jar包路径
+
+```java
+String basePath = System.getProperty("user.dir") + "/uploads/";
+File uploadDir = new File(basePath);
+if (!uploadDir.exists()) {
+    uploadDir.mkdirs(); // 创建目录
+}
+File dest = new File(basePath + file.getOriginalFilename());
+file.transferTo(dest);
+System.out.println("文件已保存至: " + dest.getAbsolutePath());
+```
+
+#### 设置静态托管
+
+```java
+@Configuration
+@Slf4j
+public class WebMvcConfiguration extends WebMvcConfigurationSupport {
+
+    @Override
+    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String uploadPath = System.getProperty("user.dir") + "/uploads/";
+        registry.addResourceHandler("/files/**")
+                .addResourceLocations("file:" + uploadPath);
+    }
+}
+```
+
+#### 配置超出大小异常拦截
+
+需要在配置文件中修改tomcat配置
+
+```properties
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=5MB
+server.tomcat.max-swallow-size = 10MB
 ```
 
 
@@ -742,86 +1046,7 @@ public Result sayHello4(HttpServletRequest request) {
 
 ## jwt_token
 
-#### jwt依赖版本问题
 
-警告：jjwt可能有版本问题
-
-java中的jwt有一个大的版本变迁，但是目前(2024/10/16)还是有大量的旧版API还在使用，在本文档中，依然会记录旧版api，并尽可能的给出新版本提示
-
-#### jjwt
-
-添加maven依赖：
-
-```xml
-<dependency>
-    <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt</artifactId>
-    <version>0.12.3</version>
-</dependency>
-```
-
-这个依赖包括下面的3个依赖
-
-```xml
-<dependency>
-    <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt-api</artifactId>
-    <version>0.12.5</version>
-</dependency>
-<dependency>
-    <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt-impl</artifactId>
-    <version>0.12.5</version>
-    <scope>runtime</scope>
-</dependency>
-<dependency>
-    <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt-jackson</artifactId> 
-    <version>0.12.5</version>
-    <scope>runtime</scope>
-</dependency>
-```
-
-##### 生成jwt
-
-不包含老版本，老版本在java其他
-
-##### **JwtProperties读取配置文件**
-
-目的是通过@ConfigurationProperties注解优雅的使用配置文件的内容（配置文件转对象）
-
-##### Claims/Jws
-
-jjwt中处理jwt的接口
-
-在 JWT 中，**Claims** 是存储在 token 内的数据，这些数据可以包括用户的身份信息、token 过期时间等。JWT 的结构通常包含三个部分：header、payload（其中包含 claims）、signature。
-
-##### 解析jwt
-
-目的是获取header和payload中的内容
-
-```java
-public static Jws<Claims> parseClaim(String token) {
-    return Jwts.parser()
-        .verifyWith(KEY)
-        .build()
-        .parseSignedClaims(token);
-}
-
-public static JwsHeader parseHeader(String token) {
-    return parseClaim(token).getHeader();
-}
-
-public static Claims parsePayload(String token) {
-    return parseClaim(token).getPayload();
-}
-```
-
-##### jwt_id(jti)
-
-很少使用
-
-在 JWT 的 Payload 中，令牌 ID (`jti`) 是可选的。使用 `jti` 有助于防止令牌重放攻击，因为每个令牌都有一个唯一的标识符，可以在服务器端存储和跟踪。
 
 ## ThreadLocal线程存储token
 
@@ -1163,11 +1388,9 @@ public class LoginCheckinterceptor implements HandlerInterceptor {
 }
 ```
 
+# 异常处理器
 
-
-# 全局异常处理器
-
-目的是统一异常规范
+目的是统一异常规范，属于springMVC
 
 程序开发过程中不可避免的会遇到各种各样的异常现象，有可能会返回不符合规范的默认值
 
@@ -1187,7 +1410,25 @@ public class GlobalExceptionHandler {
 
 ## @ExceptionHandler
 
-异常处理注解
+异常处理注解 捕获异常
+
+```java
+/**
+ * 全局异常处理器，处理项目中抛出的业务异常
+ */
+@RestControllerAdvice
+@Slf4j
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler
+    public Result exceptionHandler(BaseException e) {
+        log.warn(e.getMessage());
+        return Result.error(e.getMessage());
+    }
+}
+```
+
+其中BaseException为自己写的
 
 ## 抛出异常
 
@@ -1254,6 +1495,8 @@ public Result exceptionHandler(SQLIntegrityConstraintViolationException ex) {
 
 ## 自定义异常
 
+
+
 # 配置类
 
 ## 消息(对象)转换器
@@ -1289,304 +1532,6 @@ protected void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
 }
 ```
-
-## PageHalper封装
-
-1. common包下建立pageUtils工具类
-
-# handler
-
-## 全局异常处理器
-
-捕获异常
-
-```java
-/**
- * 全局异常处理器，处理项目中抛出的业务异常
- */
-@RestControllerAdvice
-@Slf4j
-public class GlobalExceptionHandler {
-
-    @ExceptionHandler
-    public Result exceptionHandler(BaseException e) {
-        log.warn(e.getMessage());
-        return Result.error(e.getMessage());
-    }
-}
-```
-
-其中BaseException为自己写的
-
-# 文件上传
-
-## MultipartFile
-
-在springMVC 中封装好了文件上传类 MultipartFile，直接就可以进行文件获取
-
-1. 直接在参数中设置注解获取file请求体
-
-   ```java
-   @RequestParam("file") MultipartFile file
-   ```
-
-2. 设置文件保存路劲
-
-   ```java
-   File dest = new File("C:\\Users\\35687\\Desktop\\java测试\\File\\" + file.getOriginalFilename());
-   ```
-
-3. 使用file.transferTo(dest);保存文件
-
-#### 上传单个文件
-
-```java
-@RestController
-@Slf4j
-public class MainController {
-    @PostMapping("/upload")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return "Please select a file to upload.";
-        }
-        try {
-            // 获取文件的字节流并保存到本地
-            //byte[] bytes = file.getBytes();
-            File dest = new File("C:\\Users\\35687\\Desktop\\java测试\\File\\" + file.getOriginalFilename());
-            file.transferTo(dest);
-            return "File uploaded successfully: " + file.getOriginalFilename();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "File upload failed: " + e.getMessage();
-        }
-    }
-}
-```
-
-#### 上传单个文件带参
-
-直接使用 @RequestParam 就能获取，需要和前端名称保持一致
-
-```java
-@PostMapping("/File")
-public String multipartFileTest(@RequestParam("file") MultipartFile file,@RequestParam String username,@RequestParam String email) throws Exception{
-    System.out.println("username: " + username);
-    System.out.println("email: " + email);
-    try {
-        // 获取文件的字节流并保存到本地
-        File dest = new File("/Users/liyinghao/Documents/学校课程/java作业/homeWorlForJavaWeb/java/static/" + file.getOriginalFilename());
-        file.transferTo(dest);
-        return "File uploaded successfully: " + file.getOriginalFilename();
-    } catch (IOException e) {
-        e.printStackTrace();
-        return "File upload failed: " + e.getMessage();
-    }
-}
-```
-
-#### 上传单个文件,包含其它请求实体
-
-```java
-@PostMapping
-public String multipartFileTest(@RequestParam MultipartFile multipartFile,@ApiParam(value = "用户名") @Valid UserDO userDO) throws Exception{
-    File file = new File("E:\\data\\test\\testFile");
-    multipartFile.transferTo(file);
-    return  userDO.toString();
-}
-```
-
-#### 多文件上传
-
-直接使用数组MultipartFile[] 接收就ok
-
-```java
-@PostMapping
-public JSONObject multipartFileTest(@RequestParam MultipartFile [] multipartFiles) throws Exception{
-    JSONObject jsonObject = new JSONObject();
-  	//之后可以遍历存储
-     for (MultipartFile file : files) {
-        jsonObject.put("file" + i, multipartFiles[i].getSize());
-    }
-    return jsonObject;
-}
-```
-
-#### 多文件夹保存
-
-可以实现嵌套文件夹的保存，空文件不保存
-
-```java
-@PostMapping("/api/upload")
-public String upload(@RequestParam("files") MultipartFile[] files) throws IOException {
-    String rootDir = "C:/Users/35687/Desktop/tt/";
-    for (MultipartFile file : files) {
-        log.info("文件上传{}", file.getOriginalFilename());
-        if (!file.isEmpty()) {
-            String relativePath = file.getOriginalFilename();// 获取文件的相对路径（例如：学生证/student.jpg）
-            File destFile = new File(rootDir + relativePath);// 创建目标文件对象
-            File parentDir = destFile.getParentFile();// 获取目标文件的父目录
-            if (!parentDir.exists()) {// 如果父目录不存在，创建它
-                parentDir.mkdirs();
-            }
-            file.transferTo(destFile);// 保存文件
-        }
-    }
-    return "Files uploaded successfully!";
-}
-```
-
-## 配置上传文件大小
-
-在配置文件中配置
-
-```
-spring.servlet.multipart.max-file-size=10MB
-spring.servlet.multipart.max-request-size=10MB
-```
-
-## @ModelAttribute封装上传参数
-
-前端的Content-Type: **multipart/form-data **  可以直接使用@ModelAttribute获取
-
-```java
-public String multipartFileTest(@ModelAttribute User user) {
-    String username = user.getUsername();
-    String email = user.getPassword();
-    MultipartFile file = user.getFile();
-}
-```
-
-user类
-
-```java
-@Data
-public class User {
-
-    private String username;
-
-    private String password;
-
-    private MultipartFile file;
-}
-```
-
-## 文件上传API
-
-#### 限制文件大小
-
-无需获取文件大小，推荐直接在配置文件种进行限制，见上文
-
-#### 保存文件
-
-```java
-// 设置文件保存路径，使用自定义文件名
-File dest = new File("/Users/liyinghao/Documents/学校课程/java作业/homeWorlForJavaWeb/java/static/" + newFilename);
-// 保存文件
-file.transferTo(dest);
-```
-
-#### 获取文件大小
-
-```java
-byte[] bytes = file.getBytes();
-```
-
-#### 获取文件数量
-
-获取files中的文件数量，不包括文件夹
-
-```java
-files.length
-```
-
-#### 获取文件名称
-
-获取第一个文件名称，不是文件夹名称！
-
-```java
-files[0].getOriginalFilename(); //files操作
-file.getOriginalFilename() //file操作
-```
-
-#### 获取文件路径(文件夹名称)
-
-```java
-file.getOriginalFilename();
-```
-
-这个API是可以获取到文件夹名称的
-
-如用户上传的文件夹为 a/public/index.html
-
-在file.getOriginalFilename();中会完整显示
-
-#### 获取文件父路径
-
-```java
-File destFile = new File(rootDir + relativePath);// 创建目标文件对象
-File parentDir = destFile.getParentFile();// 获取目标文件的父目录
-```
-
-## 图片回显与保存路径问题
-
-有很多种图片回显方式，使用static文件夹直接访问，默认无需配置，是自动开启的，开发的时候可以用
-
- 在springboot中有 main-->resources-->static
-
-在static中的文件可以直接访问
-
-如static/1.jpg
-
-前端的url就可以是 http://127.0.0.1:8080/1.jpg
-
-在java打包后新加入的图片无法回显！！打包后就没有resources路径了
-
-打包后的图片也会直接打包到jar包中
-
-保存设置无法使用相对路径
-
-**而且如果父路径不存在，那么并不会保存文件！**
-
-#### 设置相对jar包路径
-
-```java
-String basePath = System.getProperty("user.dir") + "/uploads/";
-File uploadDir = new File(basePath);
-if (!uploadDir.exists()) {
-    uploadDir.mkdirs(); // 创建目录
-}
-File dest = new File(basePath + file.getOriginalFilename());
-file.transferTo(dest);
-System.out.println("文件已保存至: " + dest.getAbsolutePath());
-```
-
-#### 设置静态托管
-
-```java
-@Configuration
-@Slf4j
-public class WebMvcConfiguration extends WebMvcConfigurationSupport {
-
-    @Override
-    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String uploadPath = System.getProperty("user.dir") + "/uploads/";
-        registry.addResourceHandler("/files/**")
-                .addResourceLocations("file:" + uploadPath);
-    }
-}
-```
-
-#### 设置超出大小异常拦截
-
-需要在配置文件中修改tomcat配置
-
-```properties
-spring.servlet.multipart.max-file-size=5MB
-spring.servlet.multipart.max-request-size=5MB
-server.tomcat.max-swallow-size = 10MB
-```
-
-
 
 # AOP切面编程
 
@@ -1903,38 +1848,6 @@ Druid官方文档
 ```
 https://github.com/alibaba/druid
 ```
-
-## 雪花算法
-
-雪花算法(snowflake)是twitter内部使用并开源的**分布式环境下的唯一ID生成算法**
-
-其主要优点是保证了全局ID的唯一性，避免了分布式系统环境下的ID冲突;并且生成ID的过程中无需依赖数据库等外部系统，减少了系统复杂性。不足的地方是，由于依赖时间戳，如果系统时间回拨，有可能会导致ID冲突
-
-## uuid
-
-```
-UUID uuid = UUID.randomUUID();
-System.out.println(uuid.toString());
-```
-
-java工具类中自带UUID 是 通用唯一识别码（Universally Unique Identifier）的缩写，是一种软件建构的标准，亦为[开放软件基金会](https://baike.baidu.com/item/开放软件基金会/1223731?fromModule=lemma_inlink)组织在分布式计算环境领域的一部分。其目的，是让[分布式系统](https://baike.baidu.com/item/分布式系统/4905336?fromModule=lemma_inlink)中的所有元素，都能有唯一的辨识信息，而不需要通过中央控制端来做辨识信息的指定
-
-UUID 是由一组32位数的16进制数字所构成，以连字号分隔的五组来显示，形式为 8-4-4-4-12，总共有 36个字符
-
-```
-e4eaaaf2-d142-11e1-b3e4-080027620cdd
-```
-
-**优点:**
-
-- 使用比较简单，java自带的工具类生成即可。
-
-- 性能好
-
-**缺点:**
-
-- 由于主键生成的不规律性，一般主键都是自动创建索引，长度比较长，带来的问题是占用的存储空间比较大，查询效率不高。
-- 不适合作为分布式id。
 
 # 配置相关
 
